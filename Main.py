@@ -17,14 +17,14 @@ class AutoFITs_Dispensing():
             self.model = config["DEFAULT"].get("model", "")
             self.operation = config["DEFAULT"].get("operation", "")
             self.extractpath = config["DEFAULT"].get("start_path", "")
+            self.Archpath  = config["DEFAULT"].get("Arch_path", "")
+            self.hand_fail  = config["DEFAULT"].get("hand_fail", "")
             self.potlife = config["DEFAULT"].get("potlife", "") # min.
             self.safety_time = config["DEFAULT"].get("safety_time", "") # min.
         except Exception as e:
             print(f"{e}\nPlease check config.ini")
             quit()
         
-        self.Archpath = os.path.join(os.path.dirname(self.extractpath), "Logging_Arch")
-        self.hand_fail = os.path.join(os.path.dirname(self.extractpath), "LogHand_fail")
         os.makedirs(self.Archpath, exist_ok=True)
         os.makedirs(self.hand_fail, exist_ok=True)
 
@@ -45,7 +45,7 @@ class AutoFITs_Dispensing():
                 shutil.move(os.path.dirname(filename),os.path.dirname(new_path))
             time.sleep(0.25)
 
-        print(extractedfiles)
+        # print(extractedfiles)
         return extractedfiles
     
     def TransformData(self, file):
@@ -96,20 +96,25 @@ class AutoFITs_Dispensing():
         values = ";".join(df.values())
         log_status = fn_log(self.model, self.operation, parameters,values)
         if log_status == True:
+            print(datetime.now().strftime("%m:%d:%Y_%H:%M:%S") + "\t|\t" + "Success uploaded serial >> {serial}")
             print(f"{serial} ")
         else:
             QMessageBox.critical(self, "FITs Message", "Failed uploaded data to FITs")
 
         timestamp = now.strftime("%H-%M-%S")
-        new_path = file.replace("Logging", "Logging_Arch")
+        new_path = file.replace("Logging", "Log_Ach")
         new_path = new_path.replace(serial, f"{serial}_{timestamp}")
         shutil.move(os.path.dirname(file),os.path.dirname(new_path))
 
 if __name__ == "__main__":
     dispensing = AutoFITs_Dispensing()
+    print("----Start----")
+    
     while True:
         allfile = dispensing.extractDataFile()
         for file in allfile:
             df = dispensing.TransformData(file)
             dispensing.LoadData(file, df)
+     
+        print("sleep 5 sec.")
         time.sleep(5)
