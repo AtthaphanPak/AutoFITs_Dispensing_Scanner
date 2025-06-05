@@ -87,6 +87,9 @@ class AutoFITs_Dispensing():
         return fits_df
 
     def LoadData(self, file, df):
+        if df["Result"] == "FAIL":
+            QMessageBox.critical(self, "FITs Denied", "EXPOXY EXPIRED, Please check epoxy potlife datetime.")
+            return
         serial = df["SN Scanner"]
         now = datetime.now()
         parameters = ";".join(df.keys())
