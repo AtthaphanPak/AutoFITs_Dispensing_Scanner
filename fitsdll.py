@@ -35,8 +35,6 @@ def fn_log(model: str, operation : str, parameters : str, values : str, revision
     values =  values + ";" + list_parameters["Shift"]
     fn_initDB = lib.fn_initDB(model,operation, revision ,"dbLuminar")
     if fn_initDB == "True":
-        print(parameters)
-        print(values)
         fn_log = lib.fn_log(model, operation, revision, parameters, values, ";")
         if fn_log == "True":
             return True
